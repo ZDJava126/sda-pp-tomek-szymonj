@@ -1,5 +1,6 @@
 package com.sda.db;
 
+import com.sda.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -20,7 +21,7 @@ public class HibernateUtils {
 
     private static void createSessionFactory() {
         Configuration configuration = new Configuration();
-//                configuration.addAnnotatedClass()
+               configuration.addAnnotatedClass(User.class);
 
         final ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties())
