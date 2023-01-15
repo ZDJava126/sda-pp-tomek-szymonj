@@ -17,4 +17,23 @@ public class UsersDAO {
             e.printStackTrace();
         }
     }
+
+    public void deleteUser(String username){
+
+        try(Session session = getSessionFactory().openSession()){ // od razu zamyka tez sesje w przypadku Exception
+            session.beginTransaction();
+            User user = new User();
+            user.setUsername(username);
+            session.delete(user);
+            session.getTransaction().commit();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
+
 }
