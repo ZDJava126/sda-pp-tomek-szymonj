@@ -1,76 +1,80 @@
 package com.sda;
 
-
+import com.sda.controller.InputController;
+import com.sda.controller.UserController;
 import com.sda.dao.UsersDAO;
+import com.sda.mapper.UserMapper;
 import com.sda.model.User;
+import com.sda.service.UserService;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.Scanner;
 
 public class Main {
+    public final static Scanner scanner = new Scanner(System.in);
+    public final static  UsersDAO usersDAO = new UsersDAO();
+    public final static  UserMapper userMapper = new UserMapper();
+    public final static  UserService userService = new UserService(usersDAO,userMapper);
+    public final static UserController userController = new UserController(userService);
+    public final static  InputController inputController = new InputController(scanner);
     public static void main(String[] args) {
-        UsersDAO usersDAO = new UsersDAO();
-//        List<User> lista = usersDAO.findAll();
-//        lista.forEach(System.out::println);
+        String option;
 
-//        User user = usersDAO.findByUsername("wartego");
-//        System.out.println(user);
+        do{
+            System.out.println("""
+Options:
+1 - List users
+2 - Find user
+3 - Create user
+4 - Delete user
+5 - Update users
+6 - Exit
+""");
+            option = inputController.getString("Please enter option: ");
+            switch (option){
+                case "1" -> userController.findAll();
+                case "2" -> getUser();
+                case "3" -> createUser();
+                case "4" -> deleteUser();
+                case "5" -> updateUser();
+                case "6" -> System.out.println("Bye!");
+                default -> System.out.println("Unsupported option");
+            }
+        } while (!"6".equalsIgnoreCase(option));
 
+    }
+    private static void getUser(){
+        String username = inputController.getUsername();
+        userController.findByUsername(username);
+    }
 
-//        User user1 = new User();
-//        user1.setUsername("wartego");
-//        user1.setPassword("changed");
-//        user1.setName("user");
-//        user1.setSurname("Kowalski");
-//        user1.setAge(35);
-//        user1.setEmail("adam@test.pl");
-//        usersDAO.update(user1);
-        System.out.println(usersDAO.exist("wartego"));
+    private static void createUser(){
+        User user = User.builder()
+                .username(inputController.getUsername())
+                .name(inputController.getName())
+                .surname(inputController.getSurname())
+                .age(inputController.getAge())
+                .email(inputController.getEmail())
+                .password(inputController.getPassword())
+                .build();
+        userController.create(user);
+    }
+    private static void deleteUser() {
+        String username = inputController.getUsername();
+        userController.deleteByUsername(username);
+    }
 
+    private static void updateUser() {
+        String username = inputController.getUsername();
+        System.out.println("Update user info: ");
+        User user = User.builder()
+                .username(inputController.getUsername())
+                .name(inputController.getName())
+                .surname(inputController.getSurname())
+                .age(inputController.getAge())
+                .email(inputController.getEmail())
+                .password(inputController.getPassword())
+                .build();
 
-
-       // usersDAO.update();
-
-
-//        User.builder().username(UUID.randomUUID().toString());
-
-//        User user1 = User.builder()
-//                .username("user")
-//                .name("name")
-//                .surname("surname")
-//                .password("passw")
-//                .age(30)
-//                .email("email@gamil.pl")
-//                .build();
-//
-//        UsersDAO usersDAO = new UsersDAO();
-//        usersDAO.create(user1);
-
-
-
-//        int i = 0;
-//        while(i<10){
-//            User user2 = new User();
-//            user2.setUsername("user"+i);
-//            user2.setPassword("qw");
-//            user2.setName("user");
-//            user2.setSurname("Kowalski");
-//            user2.setAge(35);
-//            user2.setEmail("adam@test.pl");
-//
-//            usersDAO.create(user2);
-//            i++;
-//        }
-//        User user2 = new User();
-//        user2.setUsername("adamKow9");
-//            user2.setPassword("qwerty1234");
-//            user2.setName("Adam");
-//            user2.setSurname("Kowalski");
-//            user2.setAge(35);
-//            user2.setEmail("adam@test.pl");
-//
-//            usersDAO.createUser(user2);
-
-        //usersDAO.deleteUser("adamKow9");
+        userController.update(user, username);
     }
 }
