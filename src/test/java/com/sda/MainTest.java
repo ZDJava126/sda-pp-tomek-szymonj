@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 public class MainTest {
@@ -17,13 +19,7 @@ public class MainTest {
         // given
         String expectedUsername = UUID.randomUUID().toString();
 
-        User expectedUser = User.builder()
-                .username(expectedUsername)
-                .password("password")
-                .name("name")
-                .surname("surname")
-                .email("example@email.com")
-                .age(30).build();
+        User expectedUser = createUser(expectedUsername);
 
         // when
         usersDAO.create(expectedUser);
@@ -61,13 +57,7 @@ public class MainTest {
     void testDeleteByUsernameUserExist() {
         // given
         String username = UUID.randomUUID().toString();
-        User expectedUser = User.builder()
-                .username(username)
-                .password("password")
-                .name("name")
-                .surname("surname")
-                .email("example@email.com")
-                .age(30).build();
+        User expectedUser = createUser(username);
 
         usersDAO.create(expectedUser);
 
@@ -87,5 +77,69 @@ public class MainTest {
             Assertions.assertNull(user);
         }
     }
+    @Test
+    void testFindAll(){
+        //give
+        String username1 = UUID.randomUUID().toString();
+        String username2 = UUID.randomUUID().toString();
+       User user1 = createUser(username1);
+       User user2 = createUser(username2);
+        List<User> expectedUsers = List.of( user1,user2        );
+        usersDAO.create(user1);
+        usersDAO.create(user2);
 
+        //when
+        List<User> actualUsers = usersDAO.findAll();
+
+
+        //then
+        Assertions.assertNotNull(actualUsers);
+        Assertions.assertNotNull(expectedUsers);
+        Assertions.assertEquals(expectedUsers.size(), actualUsers.size());
+        Assertions.assertIterableEquals(expectedUsers, actualUsers);
+    }
+
+    @Test
+    void testFindByUsername(){
+        //give
+        String username1 = UUID.randomUUID().toString();
+        User actualUser = createUser(username1);
+        usersDAO.create(actualUser);
+        //when
+        User expectedUser = usersDAO.findByUsername(username1);
+        //then
+        Assertions.assertNotNull(actualUser);
+        Assertions.assertNotNull(expectedUser);
+        Assertions.assertEquals(actualUser,expectedUser);
+    }
+
+    @Test
+    void testUpdate(){
+        String username1 = UUID.randomUUID().toString();
+        User expectedUser = createUser(username1);
+        usersDAO.create(expectedUser);
+
+        //when
+        User newUser = expectedUser;
+        newUser.setName("Test");
+        User actualUser = usersDAO.update(newUser);
+
+        //then
+//        User updateUser;
+//        try (Session session = HibernateUtils.openSession()) {
+//            updateUser = session.find(User.class, username1);
+//        }
+        Assertions.assertEquals(actualUser,newUser);
+
+    }
+
+public User createUser(String username){
+        return User.builder()
+                .username(username)
+                .password("password")
+                .name("name")
+                .surname("surname")
+                .email("example@email.com")
+                .age(30).build();
+}
 }
