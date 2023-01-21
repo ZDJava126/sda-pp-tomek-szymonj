@@ -1,39 +1,33 @@
 package com.sda.dao;
 
+import com.sda.db.HibernateUtils;
 import com.sda.model.User;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import static com.sda.db.HibernateUtils.getSessionFactory;
 
 public class UsersDAO {
 
-    public void createUser(User user){
-
-        try(Session session = getSessionFactory().openSession()){ // od razu zamyka tez sesje w przypadku Exception
-            session.beginTransaction();
+    public void create(User user) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
             session.persist(user);
-            session.getTransaction().commit();
-        } catch (Exception e){
-            e.printStackTrace();
+            transaction.commit();
         }
     }
 
-    public void deleteUser(String username){
-
-        try(Session session = getSessionFactory().openSession()){ // od razu zamyka tez sesje w przypadku Exception
-            session.beginTransaction();
-            User user = new User();
-            user.setUsername(username);
-            session.delete(user);
-            session.getTransaction().commit();
-        } catch (Exception e){
-            e.printStackTrace();
+    public boolean deleteByUsername(String username) {
+        try (Session session = HibernateUtils.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
+            User user = session.get(User.class, username);
+            if (user != null) {
+                session.remove(user);
+            }
+            transaction.commit();
+            return user != null;
         }
     }
-
-
-
-
 
 
 }
